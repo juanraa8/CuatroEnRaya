@@ -170,6 +170,8 @@ class Tablero:
         valor=valor+self.valorCeldaDiagonal(fila, col, ficha)
         return valor
 
+    #esto es una prueba de un cambio
+
    #función de evaluación heuristica de un tablero
     def heuristica(self):
         #inicializar variables
