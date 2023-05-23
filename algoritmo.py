@@ -1,83 +1,152 @@
-# Description: Implementación de algoritmos de búsqueda para el juego Conecta4
 
-
-# busca en col la primera celda vacía
-def busca(tablero, col):  
-    if tablero.getCelda(0,col) != 0:
-        i=-1
-    i=0
-    while i<tablero.getAlto() and tablero.getCelda(i,col)==0:          
-        i=i+1      
-    i=i-1
-   
+def busca(tablero, col):
+    if tablero.getCelda(0, col) != 0:
+        return -1
+    i = 0
+    while i < tablero.getAlto() and tablero.getCelda(i, col) == 0:
+        i += 1
+    i -= 1
     return i
 
 
+def valorHeuristico(tablero):
+    # Valor heurístico para el jugador MAX (2)
+    valor_max = 0
 
-# encuentra la mejor jugada para la máquina y devuelve la posicion
-# para ello implementa un algoritmo minimax con poda alfa-beta
+    # Evaluación en horizontal
+    for fila in range(tablero.getAlto()):
+        for col in range(tablero.getAncho() - 3):
+            ventana = [tablero.getCelda(fila, col + i) for i in range(4)]
+            if ventana.count(2) == 4:
+                valor_max += 1000
+            elif ventana.count(2) == 3 and ventana.count(0) == 1:
+                valor_max += 100
+            elif ventana.count(2) == 2 and ventana.count(0) == 2:
+                valor_max += 10
 
-def algoritmominimax(tablero, profundidad, alfa, beta, jugador):
-    if tablero.cuatroEnRaya()==1:
-        return -1000000
-    elif tablero.cuatroEnRaya()==2:
-        return 1000000
-    elif profundidad==0:
-        #return tablero.heuristica()
-        return tablero.heuristica()
-    elif jugador==1:
-        v=-1000000
+    # Evaluación en vertical
+    for col in range(tablero.getAncho()):
+        for fila in range(tablero.getAlto() - 3):
+            ventana = [tablero.getCelda(fila + i, col) for i in range(4)]
+            if ventana.count(2) == 4:
+                valor_max += 1000
+            elif ventana.count(2) == 3 and ventana.count(0) == 1:
+                valor_max += 100
+            elif ventana.count(2) == 2 and ventana.count(0) == 2:
+                valor_max += 10
+
+    # Evaluación en diagonal (izquierda a derecha)
+    for fila in range(tablero.getAlto() - 3):
+        for col in range(tablero.getAncho() - 3):
+            ventana = [tablero.getCelda(fila + i, col + i) for i in range(4)]
+            if ventana.count(2) == 4:
+                valor_max += 1000
+            elif ventana.count(2) == 3 and ventana.count(0) == 1:
+                valor_max += 100
+            elif ventana.count(2) == 2 and ventana.count(0) == 2:
+                valor_max += 10
+
+    # Evaluación en diagonal (derecha a izquierda)
+    for fila in range(tablero.getAlto() - 3):
+        for col in range(3, tablero.getAncho()):
+            ventana = [tablero.getCelda(fila + i, col - i) for i in range(4)]
+            if ventana.count(2) == 4:
+                valor_max += 1000
+            elif ventana.count(2) == 3 and ventana.count(0) == 1:
+                valor_max += 100
+            elif ventana.count(2) == 2 and ventana.count(0) == 2:
+                valor_max += 10
+
+    # Valor heurístico para el jugador MIN (1)
+    valor_min = 0
+
+    # Evaluación en horizontal
+    for fila in range(tablero.getAlto()):
+        for col in range(tablero.getAncho() - 3):
+            ventana = [tablero.getCelda(fila, col + i) for i in range(4)]
+            if ventana.count(1) == 4:
+                valor_min += 1000
+            elif ventana.count(1) == 3 and ventana.count(0) == 1:
+                valor_min += 100
+            elif ventana.count(1) == 2 and ventana.count(0) == 2:
+                valor_min += 10
+
+    # Evaluación en vertical
+    for col in range(tablero.getAncho()):
+        for fila in range(tablero.getAlto() - 3):
+            ventana = [tablero.getCelda(fila + i, col) for i in range(4)]
+            if ventana.count(1) == 4:
+                valor_min += 1000
+            elif ventana.count(1) == 3 and ventana.count(0) == 1:
+                valor_min += 100
+            elif ventana.count(1) == 2 and ventana.count(0) == 2:
+                valor_min += 10
+
+    # Evaluación en diagonal (izquierda a derecha)
+    for fila in range(tablero.getAlto() - 3):
+        for col in range(tablero.getAncho() - 3):
+            ventana = [tablero.getCelda(fila + i, col + i) for i in range(4)]
+            if ventana.count(1) == 4:
+                valor_min += 1000
+            elif ventana.count(1) == 3 and ventana.count(0) == 1:
+                valor_min += 100
+            elif ventana.count(1) == 2 and ventana.count(0) == 2:
+                valor_min += 10
+
+    # Evaluación en diagonal (derecha a izquierda)
+    for fila in range(tablero.getAlto() - 3):
+        for col in range(3, tablero.getAncho()):
+            ventana = [tablero.getCelda(fila + i, col - i) for i in range(4)]
+            if ventana.count(1) == 4:
+                valor_min += 1000
+            elif ventana.count(1) == 3 and ventana.count(0) == 1:
+                valor_min += 100
+            elif ventana.count(1) == 2 and ventana.count(0) == 2:
+                valor_min += 10
+
+    return valor_max - valor_min
+
+
+def minimax(tablero, profundidad, alpha, beta, max_player):
+    if profundidad == 0 or tablero.cuatroEnRaya() != 0:
+        return valorHeuristico(tablero)
+
+    if max_player:
+        max_eval = float('-inf')
+        best_col = -1
         for col in range(tablero.getAncho()):
-            fila=busca(tablero, col)
-            if fila!=-1:
-                tablero.setCelda(fila, col, jugador)
-                v=max(v, algoritmominimax(tablero, profundidad-1, alfa, beta, 2))
+            fila = busca(tablero, col)
+            if fila != -1:
+                tablero.setCelda(fila, col, 2)
+                eval = minimax(tablero, profundidad - 1, alpha, beta, False)
                 tablero.setCelda(fila, col, 0)
-                alfa=max(alfa, v)
-                if beta<=alfa:
+                if eval > max_eval:
+                    max_eval = eval
+                    best_col = col
+                alpha = max(alpha, eval)
+                if beta <= alpha:
                     break
-        return v
+        if profundidad == 4:
+            return best_col
+        return max_eval
     else:
-        v=1000000
+        min_eval = float('inf')
         for col in range(tablero.getAncho()):
-            fila=busca(tablero, col)
-            if fila!=-1:
-                tablero.setCelda(fila, col, jugador)
-                v=min(v, algoritmominimax(tablero, profundidad-1, alfa, beta, 1))
+            fila = busca(tablero, col)
+            if fila != -1:
+                tablero.setCelda(fila, col, 1)
+                eval = minimax(tablero, profundidad - 1, alpha, beta, True)
                 tablero.setCelda(fila, col, 0)
-                beta=min(beta, v)
-                if beta<=alfa:
+                min_eval = min(min_eval, eval)
+                beta = min(beta, eval)
+                if beta <= alpha:
                     break
-        return v
-
-
+        return min_eval
 
 
 def juega(tablero, posicion):
-
-    #inicializar variables
-    alfa=-1000000
-    beta=1000000
-    v=-1000000
-    col=-1
-    profundidad=4
-    #para cada columna, calcular la fila y llamar a algoritmominimax
-    for c in range(tablero.getAncho()):
-        f=busca(tablero, c)
-        if f!=-1:
-            tablero.setCelda(f, c, 2)
-            v2=algoritmominimax(tablero, profundidad-1, alfa, beta, 1)
-            if v2>v:
-                v=v2
-                col=c
-            tablero.setCelda(f, c, 0)
-    #devolver la columna con el valor más alto
-    posicion[0]=busca(tablero, col)
-    posicion[1]=col
-
-    #actualizar el array posicion con la fila y columna de la jugada
-    return posicion
-
-
-
-                
+    profundidad = 4
+    col = minimax(tablero, profundidad, float('-inf'), float('inf'), True)
+    fila = busca(tablero, col)
+    posicion[0] = fila
+    posicion[1] = col
