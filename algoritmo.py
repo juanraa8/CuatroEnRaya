@@ -165,6 +165,7 @@ def alphabeta(tablero, profundidad, alpha, beta, max_player):
         if profundidad == 4:
             return best_col
         return max_eval
+
     else:
         min_eval = float('inf')
         for col in range(tablero.getAncho()):
