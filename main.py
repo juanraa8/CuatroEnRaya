@@ -70,6 +70,6 @@ def main():
             pygame.time.delay(1500)
 
     pygame.quit()
-
+    sys.exit()
 if __name__ == "__main__":
     main()
