@@ -143,10 +143,45 @@ def minimax(tablero, profundidad, alpha, beta, max_player):
                     break
         return min_eval
 
+def alphabeta(tablero, profundidad, alpha, beta, max_player):
+    if profundidad == 0 or tablero.cuatroEnRaya() != 0:
+        return valorHeuristico(tablero)
+
+    if max_player:
+        max_eval = float('-inf')
+        best_col = -1
+        for col in range(tablero.getAncho()):
+            fila = busca(tablero, col)
+            if fila != -1:
+                tablero.setCelda(fila, col, 2)
+                eval = alphabeta(tablero, profundidad - 1, alpha, beta, False)
+                tablero.setCelda(fila, col, 0)
+                if eval > max_eval:
+                    max_eval = eval
+                    best_col = col
+                alpha = max(alpha, eval)
+                if alpha >= beta:
+                    break
+        if profundidad == 4:
+            return best_col
+        return max_eval
+    else:
+        min_eval = float('inf')
+        for col in range(tablero.getAncho()):
+            fila = busca(tablero, col)
+            if fila != -1:
+                tablero.setCelda(fila, col, 1)
+                eval = alphabeta(tablero, profundidad - 1, alpha, beta, True)
+                tablero.setCelda(fila, col, 0)
+                min_eval = min(min_eval, eval)
+                beta = min(beta, eval)
+                if alpha >= beta:
+                    break
+        return min_eval
+
 
 def juega(tablero, posicion):
     profundidad = 4
-    col = minimax(tablero, profundidad, float('-inf'), float('inf'), True)
-    fila = busca(tablero, col)
-    posicion[0] = fila
-    posicion[1] = col
+    posicion[1] = minimax(tablero, profundidad, float('-inf'), float('inf'), True)
+    posicion[0] = busca(tablero, posicion[1])
+
