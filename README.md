@@ -1,5 +1,7 @@
 # SISTEMAS-INTELIGENTES
-Asignatura de Sistemas Inteligentes (Universidad de Alicante)
+Para jugar contra algoritmo alphabeta: 
 
-
-Ficheros de Entrega de la Práctica 1: Cuatro en raya con algoritmo minimax y poda alfa-beta
+def juega(tablero, posicion):
+    profundidad = 4
+    posicion[1] = alphabeta(tablero, profundidad, float('-inf'), float('inf'), True)
+    posicion[0] = busca(tablero, posicion[1])
